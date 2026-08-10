@@ -1,0 +1,9 @@
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+exports/
+*.html
+*.pdf
+# Exported reference scripts from `make export-script`
+notebooks/*.rs
+# Jupyter Book generated output
+book/_build/

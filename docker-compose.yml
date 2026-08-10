@@ -1,0 +1,33 @@
+services:
+  rust-jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Flip to "true" to bake in the PDF export toolchain (~1GB+).
+        INCLUDE_PDF_EXPORT: "false"
+    image: rust-jupyter-env:latest
+    container_name: rust-jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      # Empty = no auth (local dev). Set a value to require a token.
+      JUPYTER_TOKEN: "${JUPYTER_TOKEN:-}"
+    volumes:
+      # Notebooks live on the host so they persist and are git-trackable.
+      - ./notebooks:/workspace
+      # The Jupyter Book source, so `jupyter-book build /book` works in-container
+      # and writes _build/html back to the host.
+      - ./book:/book
+      # Persist crates downloaded AFTER build (i.e. not in the pre-warm set),
+      # so adding a new :dep in a notebook survives container restarts.
+      - cargo-registry:/usr/local/cargo/registry
+      # Persist the sccache compilation cache across restarts (seeded from the
+      # image's pre-warmed cache on first run).
+      - sccache-cache:/opt/sccache
+    # Keeps evcxr compiles a bit snappier on some hosts.
+    stop_grace_period: 10s
+
+volumes:
+  cargo-registry:
+  sccache-cache:

@@ -1,0 +1,11 @@
+# Keep the build context small.
+notebooks/**/.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+.git
+.gitignore
+*.html
+*.pdf
+exports/
+README.md
+Makefile
+docker-compose.yml

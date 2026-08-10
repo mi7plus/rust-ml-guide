@@ -1,0 +1,31 @@
+# Table of contents — https://jupyterbook.org/customize/toc.html
+# jb-book format: top-level `parts:`, each with a caption + list of chapter files.
+# Jupyter Book generates the sidebar + prev/next navigation from this file.
+# Keep it in sync manually when adding chapters.
+format: jb-book
+root: intro
+parts:
+  - caption: Getting started
+    chapters:
+      - file: 00-setup/environment
+  - caption: Foundations
+    chapters:
+      - file: 01-foundations/ndarray-basics
+      - file: 01-foundations/polars-basics
+  - caption: Regression
+    chapters:
+      - file: 02-regression/linear-regression
+      - file: 02-regression/logistic-regression
+  - caption: Clustering
+    chapters:
+      - file: 03-clustering/kmeans
+      - file: 03-clustering/dbscan
+  - caption: Trees
+    chapters:
+      - file: 04-trees/decision-trees
+  - caption: Dimensionality Reduction
+    chapters:
+      - file: 05-dimensionality-reduction/pca
+  - caption: Appendix
+    chapters:
+      - file: appendix/crate-reference

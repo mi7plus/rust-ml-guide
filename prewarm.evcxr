@@ -1,0 +1,28 @@
+// Pre-warm script fed to the evcxr REPL at image build time (`evcxr < this`).
+// Each :dep line pulls + compiles the crate so it is cached before first
+// notebook use. Versions are pinned to keep the image reproducible; keep this
+// list in sync with the README "standard crate set".
+:timing
+// ndarray pinned to 0.15 to match linfa 0.7 (it depends on ndarray 0.15).
+// Mixing 0.15 + 0.16 in one evcxr session breaks linfa's trait impls.
+:dep ndarray = { version = "0.15" }
+:dep polars = { version = "0.44", features = ["lazy"] }
+:dep linfa = { version = "0.7" }
+:dep linfa-clustering = { version = "0.7" }
+:dep linfa-trees = { version = "0.7" }
+:dep linfa-linear = { version = "0.7" }
+:dep linfa-logistic = { version = "0.7" }
+:dep linfa-reduction = { version = "0.7" }
+:dep smartcore = { version = "0.3" }
+:dep plotters = { version = "0.3", default-features = false, features = ["evcxr", "all_series"] }
+:dep argmin = { version = "0.10" }
+
+// Touch each crate so the compiler links them (not just downloads them).
+use ndarray::Array2;
+let _a = Array2::<f64>::zeros((2, 2));
+println!("prewarm: ndarray ok");
+
+use plotters::prelude::*;
+println!("prewarm: plotters ok");
+
+println!("prewarm: all standard crates compiled and cached");

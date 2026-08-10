@@ -1,0 +1,131 @@
+# Appendix: Crate reference & evcxr troubleshooting
+
+## The crate stack
+
+| Crate | Version | Role | Python analogue |
+| ----- | ------- | ---- | --------------- |
+| `ndarray` | 0.15 | N-dimensional arrays | NumPy |
+| `polars` | 0.44 | DataFrames | pandas |
+| `linfa` | 0.7 | ML toolkit (metatraits + datasets) | scikit-learn core |
+| `linfa-linear` | 0.7 | Linear regression | `LinearRegression` |
+| `linfa-logistic` | 0.7 | Logistic regression | `LogisticRegression` |
+| `linfa-clustering` | 0.7 | k-means, DBSCAN | `KMeans`, `DBSCAN` |
+| `linfa-trees` | 0.7 | Decision trees | `DecisionTreeClassifier` |
+| `linfa-reduction` | 0.7 | PCA | `PCA` |
+| `smartcore` | 0.3 | Alternative ML toolkit | scikit-learn |
+| `plotters` | 0.3 | Plotting | matplotlib |
+| `argmin` | 0.10 | Optimization | scipy.optimize |
+
+```{important}
+**`ndarray` is pinned to 0.15**, not the newer 0.16, because `linfa` 0.7 depends
+on 0.15. Mixing 0.15 and 0.16 arrays in one kernel session breaks `linfa`'s
+trait implementations (you'll see errors like `ArrayBase: Records is not
+satisfied`). Every chapter uses 0.15.
+```
+
+## evcxr patterns you'll see throughout the book
+
+### 1. Declaring dependencies
+
+```rust
+:dep ndarray = { version = "0.15" }
+:dep linfa = { version = "0.7" }
+```
+
+The first cell that `:dep`s a crate triggers a compile (seconds, thanks to the
+pre-warmed cache — see the [environment chapter](../00-setup/environment.ipynb)).
+
+### 2. Wrap fitted models in a block
+
+`evcxr` persists variables between cells, but only if it can *name* their type.
+A fitted model (e.g. `KMeans`, `DecisionTree`) often has an un-nameable type, so
+evcxr errors with *"Couldn't automatically determine type of variable"*. The fix
+is to keep the model inside a single `{ }` block so nothing complex escapes:
+
+```rust
+{
+    let model = KMeans::params(2).fit(&dataset).expect("fit");
+    let preds = model.predict(&dataset);
+    println!("{:?}", preds);
+}
+```
+
+If you need a result **in a later cell**, return it from the block and give the
+binding an **explicit type** — evcxr can't infer the type of a block-bound
+variable well enough to persist it across cells, and errors with *"Couldn't
+automatically determine type of variable"*:
+
+```rust
+use ndarray::Array1;
+let preds: Array1<usize> = {                      // <-- explicit type
+    let model = KMeans::params(2).fit(&dataset).expect("fit");
+    model.predict(&dataset)
+};
+// ... a later cell can now use `preds`
+```
+
+(A variable bound *directly* to an expression — `let c = dbscan.transform(&x)?;`
+— doesn't need this; only block-bound bindings do.)
+
+### 3. Datasets
+
+- **Unsupervised** (clustering, PCA): `DatasetBase::from(records)` — records only.
+- **Supervised** (regression, trees): `Dataset::new(records, targets)`.
+
+## Common errors & fixes
+
+| Symptom | Cause | Fix |
+| ------- | ----- | --- |
+| `Couldn't automatically determine type of variable` | Model type isn't nameable across cells | Wrap in a `{ }` block |
+| `ArrayBase: Records is not satisfied` | ndarray 0.16 mixed with linfa's 0.15 | Pin `ndarray = "0.15"` everywhere |
+| `feature edition2024 is required` | Rust toolchain too old | Image uses Rust ≥ 1.85 |
+| First cell hangs for minutes | Crate not in the pre-warm set | Add it to `prewarm.evcxr`, rebuild |
+
+## Crates used in the later (addenda) chapters
+
+These power the evaluation, optimization, AutoML, explainability, deployment,
+monitoring, and time-series chapters. **Maturity flags are load-bearing**: this
+part of the Rust ecosystem is thinner and younger than the core modelling crates
+above, so treat versions and APIs as moving targets and re-check before relying
+on them.
+
+| Crate | Version | Role | Maturity |
+| ----- | ------- | ---- | -------- |
+| `smartcore::model_selection` / `metrics` | 0.3 | train/test split, K-fold, accuracy/RMSE/etc. | Solid |
+| `argmin` | 0.10 | general numerical optimization | Solid, actively maintained |
+| `tpe` | 0.3 | Tree-structured Parzen Estimator (Bayesian HPO) | **Focused single-algorithm crate, not a full HPO framework** |
+| `automl` | git (`cmccomb/rust-automl`) | model-zoo comparison + CV | **git-only, smaller scope than auto-sklearn/TPO; active dev** |
+| `rust_shap` | 0.1 | model-agnostic Kernel SHAP | **Early-stage (0.1.x)** |
+| `shapley` | 0.1 | general Shapley-value calculator (not ML-specific) | **Early-stage; conceptual building block** |
+| `serde` + `bincode` | 1.x | model serialization to/from disk | Solid |
+| `tract-onnx` | 0.22 | load & run ONNX models (consume models trained elsewhere) | Solid |
+| `axum` + `tokio` | 0.7 / 1.x | minimal HTTP inference server | Solid (general web stack, not ML-specific) |
+| `tracing`, `metrics` | 0.1 / 0.24 | structured logging & metrics for monitoring | Solid (general-purpose) |
+| `augurs` | 0.10 | time-series: MSTL decomposition, ETS forecasting | Real & maintained, but **TS ecosystem younger than Python's** |
+| `perpetual` | — | gradient boosting w/ built-in SHAP/PDP | **Unavailable here — requires nightly Rust; excluded from this stable image** |
+
+```{warning}
+Rust's tooling for **hyperparameter optimization** (vs. Optuna/Hyperopt),
+**explainability** (vs. SHAP/LIME), and **drift/monitoring** (vs. Evidently)
+is markedly thinner than Python's. Several chapters therefore build primitives
+**by hand** (grid/random search, permutation importance, a PSI drift check)
+rather than leaning on a niche crate that may go unmaintained.
+```
+
+## Data formats & I/O (`polars`)
+
+| Format | Read | Write |
+| ------ | ---- | ----- |
+| CSV | `CsvReadOptions::default().try_into_reader_with_file_path(Some(path))?.finish()?` | `CsvWriter::new(file).finish(&mut df)?` |
+| Parquet | `ParquetReader::new(file).finish()?` | `ParquetWriter::new(file).finish(&mut df)?` |
+| JSON | `JsonReader::new(file).finish()?` | `JsonWriter::new(file).finish(&mut df)?` |
+
+**Lazy API** — `LazyFrame` (`scan_csv` / `scan_parquet` + `.collect()`) builds a
+query plan with predicate/projection pushdown and only materializes at the end.
+Prefer it for pipelines and larger-than-memory data (see the ETL and
+Larger-Than-Memory chapters). Requires the `parquet` feature for Parquet I/O.
+
+## Adding a crate to the pre-warmed cache
+
+See the repository README: add a pinned `:dep` line to `prewarm.evcxr`, then
+`make build` (or `make rebuild-cache` for the running container).

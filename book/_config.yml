@@ -1,0 +1,46 @@
+# Jupyter Book configuration — see https://jupyterbook.org/customize/config.html
+title: "Rust ML Guide"
+author: "Rust ML Guide contributors"
+copyright: "2026"
+logo: ""
+only_build_toc_files: true
+
+# ---- Execution ------------------------------------------------------------
+# force: always re-run notebooks so published output reflects the CURRENT code.
+# This matters for the evcxr Rust kernel, whose behaviour can drift with crate
+# bumps. Switch to "cache" if per-chapter Rust recompiles make builds too slow.
+execute:
+  execute_notebooks: force
+  timeout: 1800          # seconds; Rust cells compile, so keep this generous
+  allow_errors: false
+  stderr_output: show
+
+# ---- HTML / theme ---------------------------------------------------------
+# Theme is a style choice — sphinx_book_theme is Jupyter Book's default and
+# gives the sidebar TOC + prev/next nav. Swap for another Sphinx theme if you
+# prefer a different look.
+html:
+  home_page_in_navbar: true
+  use_issues_button: true
+  use_repository_button: true
+  use_edit_page_button: true
+
+# ---- Repository (update to your fork before publishing) -------------------
+repository:
+  url: https://github.com/OWNER/rust-ml-guide
+  path_to_book: book
+  branch: main
+
+# ---- Sphinx ---------------------------------------------------------------
+sphinx:
+  config:
+    html_theme: sphinx_book_theme
+    # Allow cross-references by label across chapters (:ref: / :numref:).
+    numfig: true
+
+parse:
+  myst_enable_extensions:
+    - amsmath        # LaTeX math environments
+    - dollarmath     # $...$ inline math
+    - colon_fence    # ::: fenced admonitions
+    - linkify        # bare URLs become links

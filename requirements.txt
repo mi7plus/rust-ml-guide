@@ -1,0 +1,13 @@
+# Python side of the stack (pinned for reproducibility).
+# pandoc / texlive are installed at the system level in the Dockerfile, not here.
+jupyterlab==4.2.5
+notebook==7.2.2
+jupytext==1.16.4
+nbconvert==7.16.4
+# Pin mistune: nbconvert 7.16.4's markdown filter breaks on mistune >= 3.1
+# ('MathBlockParser has no attribute parse_axt_heading' during HTML export).
+mistune==3.0.2
+# Jupyter Book: builds the multi-chapter guide (executes notebooks, embeds
+# real Rust outputs, sidebar TOC, cross-refs). Verified to leave nbconvert +
+# mistune pins untouched.
+jupyter-book==1.0.3

@@ -1,0 +1,59 @@
+name: Deploy Jupyter Book to Pages
+
+# Builds the book INSIDE the project's Docker image (same evcxr kernel +
+# pre-warmed crates contributors use), then publishes to GitHub Pages.
+#
+# NOTE: building the image compiles evcxr + all crates from scratch (~20+ min)
+# on each run unless you add layer caching (e.g. GHCR + docker/build-push-action
+# cache). Kept simple here per the plan.
+
+on:
+  push:
+    branches: [main]
+  pull_request:          # PRs build the book (preview) but do NOT deploy
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the Docker image
+        run: docker compose build
+
+      - name: Build the book inside the container
+        run: |
+          docker compose run --rm -T \
+            -v "${{ github.workspace }}:/repo" \
+            -w /repo \
+            rust-jupyter \
+            jupyter-book build book --all
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: book/_build/html
+
+  deploy:
+    needs: build
+    # Only deploy from main; PRs stop after the build (preview) job above.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
