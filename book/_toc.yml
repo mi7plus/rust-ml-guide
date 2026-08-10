@@ -15,6 +15,9 @@ parts:
   - caption: Exploratory Data Analysis
     chapters:
       - file: 01b-eda/exploratory-data-analysis
+  - caption: ETL & Data Preparation
+    chapters:
+      - file: 01c-etl/data-preparation
   - caption: Regression
     chapters:
       - file: 02-regression/linear-regression
