@@ -12,6 +12,9 @@ parts:
     chapters:
       - file: 01-foundations/ndarray-basics
       - file: 01-foundations/polars-basics
+  - caption: Exploratory Data Analysis
+    chapters:
+      - file: 01b-eda/exploratory-data-analysis
   - caption: Regression
     chapters:
       - file: 02-regression/linear-regression
