@@ -91,7 +91,7 @@ on them.
 
 | Crate | Version | Role | Maturity |
 | ----- | ------- | ---- | -------- |
-| `smartcore::model_selection` / `metrics` | 0.3 | train/test split, K-fold, accuracy/RMSE/etc. | Solid |
+| `smartcore::model_selection` / `metrics` | 0.3 | train/test split, K-fold, accuracy/precision/recall/F1/RMSE/MAE/R²/`roc_auc_score` | Solid; **no `StratifiedKFold`, no `predict_proba`, no ROC/PR *curve points* or MAPE** — hand-rolled in the eval chapters |
 | `argmin` | 0.10 | general numerical optimization | Solid, actively maintained |
 | `tpe` | 0.3 | Tree-structured Parzen Estimator (Bayesian HPO) | **Focused single-algorithm crate, not a full HPO framework** |
 | `automl` | git (`cmccomb/rust-automl`) | model-zoo comparison + CV | **git-only, smaller scope than auto-sklearn/TPO; active dev** |
@@ -124,6 +124,25 @@ rather than leaning on a niche crate that may go unmaintained.
 query plan with predicate/projection pushdown and only materializes at the end.
 Prefer it for pipelines and larger-than-memory data (see the ETL and
 Larger-Than-Memory chapters). Requires the `parquet` feature for Parquet I/O.
+
+## Chart type reference
+
+Mirrors the [visualization gallery](../01b-eda/visualization-gallery.ipynb)'s
+closing table, so it's discoverable outside the narrative chapter. `plotters` has
+**no** box-plot, heatmap, or pair-plot primitive — those are hand-drawn from
+rectangles/lines/text in the gallery, flagged there as manual implementations.
+
+| Your question | Chart | `plotters` support |
+| --- | --- | --- |
+| Shape/skew of one numeric variable | Histogram · ECDF | Built-in series |
+| Quartiles & outliers of one variable | Box plot | **Hand-drawn** (no primitive) |
+| Strength of many pairwise relationships at once | Correlation heatmap | **Hand-drawn** (rectangles + text) |
+| What a pairwise relationship looks like | Pair plot / scatter matrix | Composed grid (`split_evenly`) |
+| Frequency of each category | Bar chart (value counts) | Built-in |
+| Target class balance | Bar chart | Built-in |
+| Which points are outliers, in context | Scatter with flagged points | Built-in series |
+| Whether missing values cluster | Missingness heatmap | **Hand-drawn** (rectangle grid) |
+| A quantity over an ordered axis | Line / time chart | Built-in (`LineSeries`) — see Time Series |
 
 ## Adding a crate to the pre-warmed cache
 

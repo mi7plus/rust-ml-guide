@@ -15,20 +15,30 @@ parts:
   - caption: Exploratory Data Analysis
     chapters:
       - file: 01b-eda/exploratory-data-analysis
+      - file: 01b-eda/visualization-gallery
   - caption: ETL & Data Preparation
     chapters:
       - file: 01c-etl/data-preparation
   - caption: Model Evaluation
     chapters:
       - file: 01d-evaluation/cross-validation
+      - file: 01d-evaluation/metrics-deep-dive
+      - file: 01d-evaluation/learning-curves
   - caption: Regression
     chapters:
       - file: 02-regression/linear-regression
       - file: 02-regression/logistic-regression
+      - file: 02-regression/regularized-regression
+  - caption: Classification
+    chapters:
+      - file: 02b-classification/knn-classification
+      - file: 02b-classification/naive-bayes
+      - file: 02b-classification/svm-classification
   - caption: Clustering
     chapters:
       - file: 03-clustering/kmeans
       - file: 03-clustering/dbscan
+      - file: 03-clustering/gaussian-mixture
   - caption: Trees
     chapters:
       - file: 04-trees/decision-trees
