@@ -27,11 +27,29 @@ scikit-learn / NumPy / pandas world, the concepts map across directly:
 
 1. **Setup** — get the reproducible Docker / evcxr environment running.
 2. **Foundations** — `ndarray` and `polars`, the array and dataframe layer.
-3. **Regression** — linear and logistic regression.
-4. **Clustering** — k-means and DBSCAN.
-5. **Trees** — decision trees.
-6. **Dimensionality reduction** — PCA.
-7. **Appendix** — a crate reference / cheat sheet and evcxr troubleshooting.
+3. **Exploratory Data Analysis** — confronting a messy dataset with `polars` + `plotters`.
+4. **ETL & Data Preparation** — cleaning, encoding, and validating into a model-ready matrix.
+5. **Model Evaluation** — train/test splitting, k-fold cross-validation, metrics.
+6. **Regression** — linear and logistic regression.
+7. **Clustering** — k-means and DBSCAN.
+8. **Trees** — decision trees.
+9. **Dimensionality reduction** — PCA.
+10. **Optimization** — `argmin` for general optimization; grid/random/TPE hyperparameter search.
+11. **AutoML** — automated model comparison with `automl`.
+12. **Explainable ML** — permutation importance, Kernel SHAP, Shapley values.
+13. **Persistence & Deployment** — saving models (`serde`/`bincode`) and serving them (`axum`).
+14. **Model Monitoring** — structured logging, metrics, and a by-hand drift check.
+15. **Time Series** — time-aware splitting, lag features, and `augurs` forecasting.
+16. **Larger-Than-Memory Data** — `polars` lazy + streaming execution.
+17. **Capstone** — every technique above, end-to-end on one dataset.
+18. **Appendix** — a crate reference / cheat sheet and evcxr troubleshooting.
+
+```{note}
+This guide reflects the real, current state of the Rust ML ecosystem — **excellent
+for the data and deployment layers, thinner but workable for ML-specific tooling**.
+Later chapters flag crate maturity honestly and hand-roll techniques (permutation
+importance, drift detection) where no mature crate exists.
+```
 
 ```{note}
 A quirk of the Rust kernel worth knowing up front: `evcxr` compiles each cell,

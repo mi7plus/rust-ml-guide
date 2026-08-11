@@ -35,6 +35,33 @@ parts:
   - caption: Dimensionality Reduction
     chapters:
       - file: 05-dimensionality-reduction/pca
+  - caption: Optimization
+    chapters:
+      - file: 05b-optimization/general-optimization
+      - file: 05b-optimization/hyperparameter-search
+  - caption: AutoML
+    chapters:
+      - file: 06-automl/automl-classification
+  - caption: Explainable ML
+    chapters:
+      - file: 07-explainability/model-interpretability
+  - caption: Persistence & Deployment
+    chapters:
+      - file: 08-persistence-deployment/saving-and-loading-models
+      - file: 08-persistence-deployment/serving-a-model
+  - caption: Model Monitoring
+    chapters:
+      - file: 09-monitoring/monitoring-a-served-model
+  - caption: Time Series
+    chapters:
+      - file: 10-time-series/time-series-fundamentals
+      - file: 10-time-series/forecasting
+  - caption: Larger-Than-Memory Data
+    chapters:
+      - file: 11-larger-than-memory/streaming-and-lazy-execution
+  - caption: Capstone Project
+    chapters:
+      - file: 12-capstone/end-to-end-project
   - caption: Appendix
     chapters:
       - file: appendix/crate-reference
