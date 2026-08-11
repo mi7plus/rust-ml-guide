@@ -18,6 +18,9 @@ parts:
   - caption: ETL & Data Preparation
     chapters:
       - file: 01c-etl/data-preparation
+  - caption: Model Evaluation
+    chapters:
+      - file: 01d-evaluation/cross-validation
   - caption: Regression
     chapters:
       - file: 02-regression/linear-regression
