@@ -80,6 +80,10 @@ let preds: Array1<usize> = {                      // <-- explicit type
 | `ArrayBase: Records is not satisfied` | ndarray 0.16 mixed with linfa's 0.15 | Pin `ndarray = "0.15"` everywhere |
 | `feature edition2024 is required` | Rust toolchain too old | Image uses Rust ≥ 1.85 |
 | First cell hangs for minutes | Crate not in the pre-warm set | Add it to `prewarm.evcxr`, rebuild |
+| Kernel dies with **no error message** when using `rayon` | `rayon::prelude` at cell top level collides with evcxr's variable-store codegen | Keep all `rayon` code (uses, data, `par_iter`) **inside a `{ }` block** — no top-level `let`/`fn` under it |
+| `the trait bound i64: Unsigned is not satisfied` | `smartcore`'s KNN / Naive Bayes / SVC want **unsigned** class labels | Use `Vec<u32>` for classification targets |
+| `no method named unwrap ... DenseMatrix` | standalone `smartcore::...::DenseMatrix::from_2d_array` returns the matrix directly | Drop the `.unwrap()` (note: `automl`'s re-exported version *does* return `Result`) |
+| SVC: `temporary value dropped while borrowed` | `SVC::fit` takes `&SVCParameters` | Bind the params to a `let` first, then pass `&params` |
 
 ## Crates used in the later (addenda) chapters
 
@@ -92,6 +96,8 @@ on them.
 | Crate | Version | Role | Maturity |
 | ----- | ------- | ---- | -------- |
 | `smartcore::model_selection` / `metrics` | 0.3 | train/test split, K-fold, accuracy/precision/recall/F1/RMSE/MAE/R²/`roc_auc_score` | Solid; **no `StratifiedKFold`, no `predict_proba`, no ROC/PR *curve points* or MAPE** — hand-rolled in the eval chapters |
+| `smartcore` models | 0.3 | `neighbors` (KNN), `naive_bayes` (Gaussian NB), `svm` (SVC), `linear::{ridge_regression,lasso,elastic_net}`, `tree::{decision_tree_classifier,decision_tree_regressor}`, `ensemble::random_forest_{classifier,regressor}` | Solid core; **no Extra Trees / gradient boosting**, no hierarchical clustering — real gaps vs scikit-learn |
+| `rayon` | 1.x | data parallelism (`par_iter`) for parallel grid search / bootstrap; also used *inside* `smartcore`'s random forests | Solid, ubiquitous |
 | `argmin` | 0.10 | general numerical optimization | Solid, actively maintained |
 | `tpe` | 0.3 | Tree-structured Parzen Estimator (Bayesian HPO) | **Focused single-algorithm crate, not a full HPO framework** |
 | `automl` | git (`cmccomb/rust-automl`) | model-zoo comparison + CV | **git-only, smaller scope than auto-sklearn/TPO; active dev** |
@@ -111,6 +117,22 @@ is markedly thinner than Python's. Several chapters therefore build primitives
 **by hand** (grid/random search, permutation importance, a PSI drift check)
 rather than leaning on a niche crate that may go unmaintained.
 ```
+
+### Hand-rolled in the regression & optimization chapters
+
+Library-backed where possible, hand-rolled where no maintained crate exists:
+
+| Technique | Status |
+| --------- | ------ |
+| Linear / multiple regression, R² | `smartcore::linear::linear_regression` + `metrics::r2` (library) |
+| **VIF** (multicollinearity) | **Hand-rolled** — `1/(1−R²_j)` from per-predictor regressions; no crate exposes it |
+| Adjusted R², standardized coefficients | Hand-rolled formulas on top of the library fits |
+| **Multi-output / multivariate OLS** | **Hand-rolled** `(XᵀX)⁻¹XᵀY` with `ndarray` — `smartcore`/`linfa` are single-target; a **Gauss-Jordan inverse** avoids an `ndarray-linalg` LAPACK backend |
+| **Gradient descent** (batch/SGD/mini-batch, momentum, Adam) | **Hand-rolled** with `ndarray` for teaching; `argmin` is the production path |
+| Logistic regression, **L2** | `smartcore::linear::logistic_regression` (`.with_alpha(...)` = L2) |
+| Logistic **L1 / ElasticNet** | **Hand-rolled** cross-entropy GD + proximal soft-threshold — `smartcore`/`linfa` expose only L2 for logistic |
+| **Anomaly detection** (Mahalanobis, k-NN outlier score) | **Hand-rolled** (`ndarray` + Gauss-Jordan inverse) — no maintained Isolation Forest / LOF crate; `augurs` covers *time-series* outliers |
+| **Probability calibration** (reliability diagram, Brier, Platt scaling) | **Hand-rolled** — Platt = a 2-param logistic on the scores; no isotonic-regression crate (that fallback is hand-rolled too) |
 
 ## Data formats & I/O (`polars`)
 

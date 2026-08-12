@@ -37,6 +37,9 @@ sphinx:
     html_theme: sphinx_book_theme
     # Allow cross-references by label across chapters (:ref: / :numref:).
     numfig: true
+    # Generate slug anchors for headings (h1-h3) so intra-book markdown links
+    # like `visualization-gallery.ipynb#3-correlation-heatmap` resolve.
+    myst_heading_anchors: 3
 
 parse:
   myst_enable_extensions:

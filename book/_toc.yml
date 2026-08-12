@@ -27,8 +27,10 @@ parts:
   - caption: Regression
     chapters:
       - file: 02-regression/linear-regression
+      - file: 02-regression/multi-output-regression
       - file: 02-regression/logistic-regression
       - file: 02-regression/regularized-regression
+      - file: 02-regression/regularized-logistic-regression
   - caption: Classification
     chapters:
       - file: 02b-classification/knn-classification
@@ -42,19 +44,35 @@ parts:
   - caption: Trees
     chapters:
       - file: 04-trees/decision-trees
+  - caption: Multithreaded ML
+    chapters:
+      - file: 04b-multithreading/parallel-ml
+  - caption: Ensemble & Forest Models
+    chapters:
+      - file: 04c-ensemble/random-forests
+      - file: 04c-ensemble/gradient-boosting
+      - file: 04c-ensemble/bagging-and-stacking
   - caption: Dimensionality Reduction
     chapters:
       - file: 05-dimensionality-reduction/pca
+  - caption: Anomaly Detection
+    chapters:
+      - file: 13-anomaly-detection/detecting-outliers
   - caption: Optimization
     chapters:
       - file: 05b-optimization/general-optimization
+      - file: 05b-optimization/gradient-descent-variants
       - file: 05b-optimization/hyperparameter-search
+      - file: 05b-optimization/search-strategy-comparison
   - caption: AutoML
     chapters:
       - file: 06-automl/automl-classification
   - caption: Explainable ML
     chapters:
       - file: 07-explainability/model-interpretability
+  - caption: Model Calibration
+    chapters:
+      - file: 14-model-calibration/calibrating-probabilities
   - caption: Persistence & Deployment
     chapters:
       - file: 08-persistence-deployment/saving-and-loading-models
