@@ -7,3 +7,5 @@ exports/
 notebooks/*.rs
 # Jupyter Book generated output
 book/_build/
+# JetBrains IDE project config (editor-specific, not shared)
+.idea/

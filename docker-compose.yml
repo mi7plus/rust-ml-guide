@@ -19,6 +19,11 @@ services:
       # The Jupyter Book source, so `jupyter-book build /book` works in-container
       # and writes _build/html back to the host.
       - ./book:/book
+      # Same guide source, surfaced INSIDE the JupyterLab workspace as `guide/`,
+      # so the chapters are directly openable and runnable in the notebook UI.
+      # (Data paths in the chapters are absolute `/book/...`, which still resolve
+      # via the mount above.)
+      - ./book:/workspace/guide
       # Persist crates downloaded AFTER build (i.e. not in the pre-warm set),
       # so adding a new :dep in a notebook survives container restarts.
       - cargo-registry:/usr/local/cargo/registry

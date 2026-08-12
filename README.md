@@ -1,12 +1,39 @@
-# Portable Rust Jupyter Notebook Environment
+# Rust ML Guide
 
-A Dockerized [JupyterLab](https://jupyter.org/) setup for interactive **Rust**
-development (data-science / ML-style workflows) using the
-[`evcxr`](https://github.com/evcxr/evcxr) kernel. Everything runs inside a
-container, so the **only host dependency is Docker**. No local Rust or Jupyter
-install required.
+[![Deploy Jupyter Book to Pages](https://github.com/mi7plus/rust-ml-guide/actions/workflows/deploy-book.yml/badge.svg)](https://github.com/mi7plus/rust-ml-guide/actions/workflows/deploy-book.yml)
+[![Published site](https://img.shields.io/badge/read-online-brightgreen)](https://mi7plus.github.io/rust-ml-guide/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## Stack
+A **book-length, runnable introduction to machine learning in Rust** — 20+ parts,
+40+ chapters spanning `ndarray`/`polars` foundations, EDA & ETL, model evaluation,
+regression & classification, clustering, trees & ensembles, multithreading,
+optimization & gradient descent, AutoML, explainability, persistence & serving,
+monitoring, time series, larger-than-memory data, anomaly detection, calibration,
+and an end-to-end capstone. **Every chapter is a live Rust notebook** — its code is
+compiled and run by the [`evcxr`](https://github.com/evcxr/evcxr) kernel to produce
+the plots and results you see — published as a
+[Jupyter Book](https://jupyterbook.org) from the notebooks in [`book/`](book/).
+
+The guide ships with the **portable Rust Jupyter environment that runs it**: a
+Dockerized [JupyterLab](https://jupyter.org/) + `evcxr` setup with the ML crates
+pre-warmed into the image, so the whole thing runs with the **only host dependency
+being Docker** — no local Rust or Jupyter install.
+
+## Run the guide
+
+```bash
+make up        # start JupyterLab at http://localhost:8888
+```
+
+The chapters appear in the **`guide/`** folder in the JupyterLab file browser —
+open any one, pick the **Rust** kernel, and run its cells. Prefer the rendered
+static site (with all outputs embedded)? `make book` builds it to
+`book/_build/html` — see [The book](#the-book-rust-ml-guide).
+
+## The portable environment
+
+The runtime under the guide (also usable on its own for any Rust data-science /
+ML notebook work):
 
 | Component            | Purpose                                         |
 | ------------------- | ----------------------------------------------- |
@@ -18,11 +45,9 @@ install required.
 
 **Pre-warmed crates** (compiled into the image cache so first use is instant):
 `ndarray`, `polars`, `linfa`, `linfa-clustering`, `linfa-trees`, `linfa-linear`,
-`linfa-logistic`, `linfa-reduction`, `smartcore`, `plotters`, `argmin`.
-
-This repo also hosts the **Rust ML Guide**, a multi-chapter
-[Jupyter Book](https://jupyterbook.org) built from executable notebooks under
-[`book/`](book/) — see [The book](#the-book-rust-ml-guide) below.
+`linfa-logistic`, `linfa-reduction`, `smartcore`, `plotters`, `argmin` (plus the
+addenda crates: `rayon`, `tpe`, `automl`, `rust_shap`, `augurs`, `axum`, and more —
+see the [crate reference](book/appendix/crate-reference.md)).
 
 ## Why Rust for data science / ML?
 
@@ -201,16 +226,23 @@ Keep the crate list in `prewarm.evcxr` and the README table in sync.
 
 ## The book (Rust ML Guide)
 
-The [`book/`](book/) directory is a [Jupyter Book](https://jupyterbook.org): a
-multi-chapter guide to machine learning in Rust, written as executable notebooks
-that are compiled and run at build time so the published pages show **real Rust
-outputs** (printed results and `plotters` charts).
+The [`book/`](book/) directory is a [Jupyter Book](https://jupyterbook.org): the
+full guide, written as executable notebooks that are compiled and run at build
+time so the published pages show **real Rust outputs** (printed results and
+`plotters` charts). The structure and full chapter order live in
+[`book/_toc.yml`](book/_toc.yml).
 
-Chapters (see [`book/_toc.yml`](book/_toc.yml)): setup → `ndarray`/`polars`
-foundations → linear & logistic regression → k-means & DBSCAN clustering →
-decision trees → PCA → AutoML → crate-reference appendix.
+Two ways to read it:
 
-### Build the book locally
+### Interactively — run the cells yourself
+
+`make up`, then in JupyterLab open the **`guide/`** folder. Chapters are laid out
+by part (`01-foundations/`, `02-regression/`, … `13-anomaly-detection/`,
+`14-model-calibration/`). Open any notebook, pick the **Rust** kernel, and run it.
+`guide/` is the live [`book/`](book/) source mounted into the workspace, so it's
+always in sync — edit a chapter here and `make book` picks it up.
+
+### As a static site
 
 ```bash
 make up            # start the container (once)
