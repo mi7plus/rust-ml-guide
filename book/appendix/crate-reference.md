@@ -20,7 +20,11 @@
 **`ndarray` is pinned to 0.15**, not the newer 0.16, because `linfa` 0.7 depends
 on 0.15. Mixing 0.15 and 0.16 arrays in one kernel session breaks `linfa`'s
 trait implementations (you'll see errors like `ArrayBase: Records is not
-satisfied`). Every chapter uses 0.15.
+satisfied`). Every chapter uses 0.15 — the **one exception** is the ETL chapter's
+SMOTE step, which runs [`imbalance-rs`](https://crates.io/crates/imbalance-rs) on
+`ndarray` 0.16. That's safe only because the ETL notebook never loads `linfa`,
+and it builds the SMOTE arrays from plain `Vec`s so the 0.15 and 0.16 types never
+have to meet.
 ```
 
 ## evcxr patterns you'll see throughout the book
@@ -98,6 +102,7 @@ on them.
 | `smartcore::model_selection` / `metrics` | 0.3 | train/test split, K-fold, accuracy/precision/recall/F1/RMSE/MAE/R²/`roc_auc_score` | Solid; **no `StratifiedKFold`, no `predict_proba`, no ROC/PR *curve points* or MAPE** — hand-rolled in the eval chapters |
 | `smartcore` models | 0.3 | `neighbors` (KNN), `naive_bayes` (Gaussian NB), `svm` (SVC), `linear::{ridge_regression,lasso,elastic_net}`, `tree::{decision_tree_classifier,decision_tree_regressor}`, `ensemble::random_forest_{classifier,regressor}` | Solid core; **no Extra Trees / gradient boosting**, no hierarchical clustering — real gaps vs scikit-learn |
 | `rayon` | 1.x | data parallelism (`par_iter`) for parallel grid search / bootstrap; also used *inside* `smartcore`'s random forests | Solid, ubiquitous |
+| `imbalance-rs` | 0.5 | imbalanced-data resampling — `Smote` + `Adasyn`, Borderline/SVM/KMeans-SMOTE, `SmoteNc` (mixed numeric+categorical), under-samplers, combined `SmoteEnn`/`SmoteTomek`; a port of Python's `imbalanced-learn` | Newer but real & maintained; **built on `ndarray` 0.16** — use only where `linfa` (0.15) isn't also loaded (the ETL chapter's SMOTE step). Plain `Smote` interpolates every column, so use `SmoteNc` for one-hot/ordinal features |
 | `argmin` | 0.10 | general numerical optimization | Solid, actively maintained |
 | `tpe` | 0.3 | Tree-structured Parzen Estimator (Bayesian HPO) | **Focused single-algorithm crate, not a full HPO framework** |
 | `automl` | git (`cmccomb/rust-automl`) | model-zoo comparison + CV | **git-only, smaller scope than auto-sklearn/TPO; active dev** |
