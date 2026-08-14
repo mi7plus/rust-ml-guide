@@ -99,7 +99,8 @@ on them.
 
 | Crate | Version | Role | Maturity |
 | ----- | ------- | ---- | -------- |
-| `smartcore::model_selection` / `metrics` | 0.3 | train/test split, K-fold, accuracy/precision/recall/F1/RMSE/MAE/R²/`roc_auc_score` | Solid; **no `StratifiedKFold`, no `predict_proba`, no ROC/PR *curve points* or MAPE** — hand-rolled in the eval chapters |
+| `smartcore::model_selection` / `metrics` | 0.3 | train/test split, K-fold, accuracy/precision/recall/F1/RMSE/MAE/R²/`roc_auc_score` | Solid; **no `StratifiedKFold`, no `predict_proba`, no ROC/PR *curve points* or MAPE** — the curves are drawn with `plotters-statistical`, MAPE/stratified-KFold hand-rolled |
+| `plotters-statistical` | 0.2 | statistical chart primitives as native `plotters` series/figures — box, violin, ECDF, Q–Q, correlation & missingness heatmaps, pair plot, ROC, precision-recall, calibration, regularization-path, residual | Newer, single-author; pins `plotters = "=0.3.7"`. Use with `default-features = false` (as the book does) to avoid the `font-kit`/`fontconfig` native stack |
 | `smartcore` models | 0.3 | `neighbors` (KNN), `naive_bayes` (Gaussian NB), `svm` (SVC), `linear::{ridge_regression,lasso,elastic_net}`, `tree::{decision_tree_classifier,decision_tree_regressor}`, `ensemble::random_forest_{classifier,regressor}` | Solid core; **no Extra Trees / gradient boosting**, no hierarchical clustering — real gaps vs scikit-learn |
 | `rayon` | 1.x | data parallelism (`par_iter`) for parallel grid search / bootstrap; also used *inside* `smartcore`'s random forests | Solid, ubiquitous |
 | `imbalance-rs` | 0.5 | imbalanced-data resampling — `Smote` + `Adasyn`, Borderline/SVM/KMeans-SMOTE, `SmoteNc` (mixed numeric+categorical), under-samplers, combined `SmoteEnn`/`SmoteTomek`; a port of Python's `imbalanced-learn` | Newer but real & maintained; **built on `ndarray` 0.16** — use only where `linfa` (0.15) isn't also loaded (the ETL chapter's SMOTE step). Plain `Smote` interpolates every column, so use `SmoteNc` for one-hot/ordinal features |
@@ -155,21 +156,32 @@ Larger-Than-Memory chapters). Requires the `parquet` feature for Parquet I/O.
 ## Chart type reference
 
 Mirrors the [visualization gallery](../01b-eda/visualization-gallery.ipynb)'s
-closing table, so it's discoverable outside the narrative chapter. `plotters` has
-**no** box-plot, heatmap, or pair-plot primitive — those are hand-drawn from
-rectangles/lines/text in the gallery, flagged there as manual implementations.
+closing table, so it's discoverable outside the narrative chapter. `plotters`
+itself has **no** statistical-chart primitives — box, violin, heatmap, pair-plot,
+ECDF, Q–Q, ROC/PR, calibration, regularization-path or residual. Those all come
+from [`plotters-statistical`](https://crates.io/crates/plotters-statistical),
+which adds them as native `plotters` series/figures (so they compose with
+`ChartBuilder` / `draw_series`). Histograms, bar charts and scatter/line plots use
+`plotters`' own built-ins. The crate is pinned to `plotters = "=0.3.7"` and is used
+with `default-features = false` so it needs no system font libraries.
 
-| Your question | Chart | `plotters` support |
+| Your question | Chart | How it's drawn |
 | --- | --- | --- |
-| Shape/skew of one numeric variable | Histogram · ECDF | Built-in series |
-| Quartiles & outliers of one variable | Box plot | **Hand-drawn** (no primitive) |
-| Strength of many pairwise relationships at once | Correlation heatmap | **Hand-drawn** (rectangles + text) |
-| What a pairwise relationship looks like | Pair plot / scatter matrix | Composed grid (`split_evenly`) |
-| Frequency of each category | Bar chart (value counts) | Built-in |
-| Target class balance | Bar chart | Built-in |
+| Shape/skew of one numeric variable | Histogram · ECDF | Histogram built-in; ECDF via `plotters-statistical` `Ecdf` |
+| Is one variable normally distributed | Q–Q plot | `plotters-statistical` `QqPlot` |
+| Quartiles & outliers of one variable | Box plot | `plotters-statistical` `BoxPlotSeries` |
+| Full density/shape (skew, modes) of one variable | Violin plot | `plotters-statistical` `ViolinPlotSeries` |
+| Strength of many pairwise relationships at once | Correlation heatmap | `plotters-statistical` `CorrelationHeatmap` |
+| What a pairwise relationship looks like | Pair plot / scatter matrix | `plotters-statistical` `PairPlot` |
+| Whether missing values cluster | Missingness heatmap | `plotters-statistical` `MissingnessHeatmap` |
+| Frequency of each category · target class balance | Bar chart | Built-in (`Rectangle`) |
 | Which points are outliers, in context | Scatter with flagged points | Built-in series |
-| Whether missing values cluster | Missingness heatmap | **Hand-drawn** (rectangle grid) |
 | A quantity over an ordered axis | Line / time chart | Built-in (`LineSeries`) — see Time Series |
+| Threshold-independent ranking quality | ROC curve / AUC | `plotters-statistical` `RocCurve` |
+| Precision/recall trade-off (imbalanced) | Precision-recall curve | `plotters-statistical` `PrecisionRecallCurve` |
+| Are predicted probabilities trustworthy | Calibration (reliability) curve | `plotters-statistical` `CalibrationCurve` |
+| How coefficients shrink with the penalty | Regularization path | `plotters-statistical` `RegularizationPath` |
+| Are regression errors patterned | Residual plot | `plotters-statistical` `ResidualPlot` |
 
 ## Adding a crate to the pre-warmed cache
 
