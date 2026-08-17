@@ -107,7 +107,8 @@ on them.
 | `rayon` | 1.x | data parallelism (`par_iter`) for parallel grid search / bootstrap; also used *inside* `smartcore`'s random forests | Solid, ubiquitous |
 | `imbalance-rs` | 0.5 | imbalanced-data resampling — `Smote` + `Adasyn`, Borderline/SVM/KMeans-SMOTE, `SmoteNc` (mixed numeric+categorical), under-samplers, combined `SmoteEnn`/`SmoteTomek`; a port of Python's `imbalanced-learn` | Newer but real & maintained; **built on `ndarray` 0.16** — use only where `linfa` (0.15) isn't also loaded (the ETL chapter's SMOTE step). Plain `Smote` interpolates every column, so use `SmoteNc` for one-hot/ordinal features |
 | `argmin` | 0.10 | general numerical optimization | Solid, actively maintained |
-| `tpe` | 0.3 | Tree-structured Parzen Estimator (Bayesian HPO) | **Focused single-algorithm crate, not a full HPO framework** |
+| `tpe` | 0.3 | Tree-structured Parzen Estimator (Bayesian HPO) | Focused single-algorithm crate; now used *through* `hyperopt-rs`'s `TpeSampler` rather than directly |
+| `hyperopt-rs` | 0.1 | Optuna-shaped HPO framework (facade over hyperopt-core/samplers/pruners/storage): define-by-run `Study` + `trial.suggest_*`, interchangeable `GridSampler`/`RandomSampler`/`TpeSampler`/`CmaEsSampler`, median/ASHA pruning, in-memory + SQLite storage, local-parallel (`optimize_parallel`) and multi-machine distributed execution | Newer, single-author; the first full HPO *framework* in Rust (vs. Optuna). Pure Rust — pulls `tpe` + bundled SQLite via `rusqlite`, no system libraries needed |
 | `automl` | git (`cmccomb/rust-automl`) | model-zoo comparison + CV | **git-only, smaller scope than auto-sklearn/TPO; active dev** |
 | `rust_shap` | 0.1 | model-agnostic Kernel SHAP | **Early-stage (0.1.x)** |
 | `shapley` | 0.1 | general Shapley-value calculator (not ML-specific) | **Early-stage; conceptual building block** |
@@ -119,11 +120,13 @@ on them.
 | `perpetual` | — | gradient boosting w/ built-in SHAP/PDP | **Unavailable here — requires nightly Rust; excluded from this stable image** |
 
 ```{warning}
-Rust's tooling for **hyperparameter optimization** (vs. Optuna/Hyperopt),
-**explainability** (vs. SHAP/LIME), and **drift/monitoring** (vs. Evidently)
-is markedly thinner than Python's. Several chapters therefore build primitives
-**by hand** (grid/random search, permutation importance, a PSI drift check)
-rather than leaning on a niche crate that may go unmaintained.
+Rust's tooling for **explainability** (vs. SHAP/LIME) and **drift/monitoring**
+(vs. Evidently) is still thinner than Python's, so a few chapters build those
+primitives **by hand** (permutation importance, a PSI drift check).
+**Hyperparameter optimization** has caught up —
+[`hyperopt-rs`](https://crates.io/crates/hyperopt-rs) is a full Optuna-shaped
+framework — so the optimization chapters now use it rather than hand-rolled
+grid/random search.
 ```
 
 ### Hand-rolled in the regression & optimization chapters
