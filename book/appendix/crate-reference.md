@@ -110,8 +110,8 @@ on them.
 | `tpe` | 0.3 | Tree-structured Parzen Estimator (Bayesian HPO) | Focused single-algorithm crate; now used *through* `hyperopt-rs`'s `TpeSampler` rather than directly |
 | `hyperopt-rs` | 0.1 | Optuna-shaped HPO framework (facade over hyperopt-core/samplers/pruners/storage): define-by-run `Study` + `trial.suggest_*`, interchangeable `GridSampler`/`RandomSampler`/`TpeSampler`/`CmaEsSampler`, median/ASHA pruning, in-memory + SQLite storage, local-parallel (`optimize_parallel`) and multi-machine distributed execution | Newer, single-author; the first full HPO *framework* in Rust (vs. Optuna). Pure Rust — pulls `tpe` + bundled SQLite via `rusqlite`, no system libraries needed |
 | `automl` | git (`cmccomb/rust-automl`) | model-zoo comparison + CV | **git-only, smaller scope than auto-sklearn/TPO; active dev** |
-| `rust_shap` | 0.1 | model-agnostic Kernel SHAP | **Early-stage (0.1.x)** |
-| `shapley` | 0.1 | general Shapley-value calculator (not ML-specific) | **Early-stage; conceptual building block** |
+| `shap-rs` | 0.1 | native SHAP: exact interventional, Kernel (constrained WLS), linear, polynomial **TreeSHAP**, permutation/sampling, gradient/Deep (Burn), exact interaction values; batch `ndarray` models, custom maskers, and plot-ready **SVG** (bar / force / waterfall / beeswarm) | Newer, single-author, but the most complete SHAP in Rust — powers the explainability chapter's Kernel SHAP. Core is pure Rust (`ndarray` 0.16 + `rand`); Burn / JSON adapters are behind features |
+| `shapley` | 0.1 | general Shapley-value calculator (not ML-specific) | Early-stage; used only to illustrate the game-theory concept behind SHAP |
 | `serde` + `bincode` | 1.x | model serialization to/from disk | Solid |
 | `tract-onnx` | 0.22 | load & run ONNX models (consume models trained elsewhere) | Solid |
 | `axum` + `tokio` | 0.7 / 1.x | minimal HTTP inference server | Solid (general web stack, not ML-specific) |
@@ -121,13 +121,14 @@ on them.
 | `perpetual` | — | gradient boosting w/ built-in SHAP/PDP | **Unavailable here — requires nightly Rust; excluded from this stable image** |
 
 ```{warning}
-Rust's tooling for **explainability** (vs. SHAP/LIME) is still thinner than
-Python's, so one chapter builds it **by hand** (permutation importance). The other
-former gaps have since been filled by dedicated crates: **hyperparameter
-optimization** by [`hyperopt-rs`](https://crates.io/crates/hyperopt-rs) (an
-Optuna-shaped framework) and **drift / monitoring** by
-[`driftwatch`](https://crates.io/crates/driftwatch) (PSI / KL / JS / KS drift
-detection) — so those chapters use the crates rather than hand-rolled code.
+The former ecosystem gaps have largely filled in with dedicated crates:
+**hyperparameter optimization** by [`hyperopt-rs`](https://crates.io/crates/hyperopt-rs)
+(an Optuna-shaped framework), **drift / monitoring** by
+[`driftwatch`](https://crates.io/crates/driftwatch) (PSI / KL / JS / KS), and
+**explainability** by [`shap-rs`](https://crates.io/crates/shap-rs) (native SHAP).
+A few primitives are still built **by hand** where that's the clearer teaching
+choice — permutation importance, the capstone's simple checks — not for lack of a
+maintained library.
 ```
 
 ### Hand-rolled in the regression & optimization chapters
