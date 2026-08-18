@@ -116,17 +116,18 @@ on them.
 | `tract-onnx` | 0.22 | load & run ONNX models (consume models trained elsewhere) | Solid |
 | `axum` + `tokio` | 0.7 / 1.x | minimal HTTP inference server | Solid (general web stack, not ML-specific) |
 | `tracing`, `metrics` | 0.1 / 0.24 | structured logging & metrics for monitoring | Solid (general-purpose) |
+| `driftwatch` | 0.1 | data & model **drift detection**: PSI / KL / JS divergence, KS + chi-square two-sample tests, `ReferenceDistribution` + `DatasetMonitor` → `DriftReport`, live windowing, pluggable alerting (log / webhook), Prometheus export, a live HTTP dashboard, optional streaming/online drift | Newer, single-author; the Rust answer to Evidently. Core is pure Rust (`ndarray` 0.16 + `statrs`), API takes `&[f64]`; alerting / dashboard / streaming are behind features |
 | `augurs` | 0.10 | time-series: MSTL decomposition, ETS forecasting | Real & maintained, but **TS ecosystem younger than Python's** |
 | `perpetual` | — | gradient boosting w/ built-in SHAP/PDP | **Unavailable here — requires nightly Rust; excluded from this stable image** |
 
 ```{warning}
-Rust's tooling for **explainability** (vs. SHAP/LIME) and **drift/monitoring**
-(vs. Evidently) is still thinner than Python's, so a few chapters build those
-primitives **by hand** (permutation importance, a PSI drift check).
-**Hyperparameter optimization** has caught up —
-[`hyperopt-rs`](https://crates.io/crates/hyperopt-rs) is a full Optuna-shaped
-framework — so the optimization chapters now use it rather than hand-rolled
-grid/random search.
+Rust's tooling for **explainability** (vs. SHAP/LIME) is still thinner than
+Python's, so one chapter builds it **by hand** (permutation importance). The other
+former gaps have since been filled by dedicated crates: **hyperparameter
+optimization** by [`hyperopt-rs`](https://crates.io/crates/hyperopt-rs) (an
+Optuna-shaped framework) and **drift / monitoring** by
+[`driftwatch`](https://crates.io/crates/driftwatch) (PSI / KL / JS / KS drift
+detection) — so those chapters use the crates rather than hand-rolled code.
 ```
 
 ### Hand-rolled in the regression & optimization chapters
