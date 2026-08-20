@@ -118,6 +118,7 @@ on them.
 | `tracing`, `metrics` | 0.1 / 0.24 | structured logging & metrics for monitoring | Solid (general-purpose) |
 | `driftwatch` | 0.1 | data & model **drift detection**: PSI / KL / JS divergence, KS + chi-square two-sample tests, `ReferenceDistribution` + `DatasetMonitor` → `DriftReport`, live windowing, pluggable alerting (log / webhook), Prometheus export, a live HTTP dashboard, optional streaming/online drift | Newer, single-author; the Rust answer to Evidently. Core is pure Rust (`ndarray` 0.16 + `statrs`), API takes `&[f64]`; alerting / dashboard / streaming are behind features |
 | `augurs` | 0.10 | time-series: MSTL decomposition, ETS forecasting | Real & maintained, but **TS ecosystem younger than Python's** |
+| `incremental-rs` | 0.1 | **out-of-core / incremental training**: `partial_fit` estimators — SGD linear / logistic regression, Welford-online Gaussian Naive Bayes, mini-batch k-means — that update batch-by-batch without loading the whole dataset; optional `polars-streaming` fits straight from a parquet stream | Newer, single-author; fills the "training needs everything in RAM" gap for algorithms with an incremental form. Pure Rust (`ndarray` **0.15**, matches `linfa`); trees / forests / exact OLS have no incremental variant |
 | `perpetual` | — | gradient boosting w/ built-in SHAP/PDP | **Unavailable here — requires nightly Rust; excluded from this stable image** |
 
 ```{warning}
